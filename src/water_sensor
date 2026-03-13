@@ -1,0 +1,16 @@
+// Macro
+#define WATER_SENSOR_PIN A0
+
+// Variable
+uint16_t sensor_reading;
+uint16_t dt = 500;
+
+void setup(){
+  Serial.begin(115200);
+}
+
+void loop(){
+  sensor_reading = analogRead(WATER_SENSOR_PIN);
+  Serial.println(sensor_reading);
+  delay(dt);
+}
