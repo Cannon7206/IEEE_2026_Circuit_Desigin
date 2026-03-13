@@ -28,7 +28,7 @@
 volatile long encoderCount = 0;   // volatile: written in ISR, read in main loop
 unsigned long lastTime  = 0;
 long          lastCount = 0;
-
+unsigned long startTime = 0;
 LiquidCrystal lcd(RS, Enable, D4, D5, D6, D7);
 
 // ---------------------------------------------------------------
@@ -69,9 +69,6 @@ void lcdCountdown() {
   lcd.clear();
 }
 
-// ---------------------------------------------------------------
-// setup
-// ---------------------------------------------------------------
 void setup() {
   // LCD
   lcd.begin(16, 2);
@@ -97,19 +94,18 @@ void setup() {
   lcdCountdown();
 
   // Set motor direction and ramp up
-  digitalWrite(LED_RED,   HIGH);  // motor running indicator
+  digitalWrite(LED_RED,   LOW);  // motor running indicator
   digitalWrite(LED_GREEN, LOW);
   digitalWrite(M1A, HIGH);
   digitalWrite(M2A, LOW);
   motor_ramp_up();
 
   lastTime = millis();
+  startTime = millis();
 }
 
-// ---------------------------------------------------------------
-// loop
-// ---------------------------------------------------------------
 void loop() {
+  
   unsigned long currentTime = millis();
 
   // Print RPM every 1000 ms
@@ -124,7 +120,20 @@ void loop() {
     // RISING only → deltaCount pulses per second
     // RPM = (pulses/sec) / (pulses/rev) * 60
     float rpm = ((float)deltaCount / ENCODER_PULSES_PER_ROTATION) * 60.0f;
-
+    if ((rpm <= 105 && currentTime - startTime > 3000)) {
+      digitalWrite(LED_RED, HIGH);
+      Serial.print("Start Up Failed");
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Motor Failed to Reach");
+      lcd.setCursor(0, 1);
+      lcd.print("Top Speed!");
+      motor_ramp_down();
+      while(1){};
+    }
+    else {
+      digitalWrite(LED_GREEN, HIGH);
+    }
     // Serial output
     Serial.print("Encoder Count: ");
     Serial.print(currentCount);
@@ -143,4 +152,5 @@ void loop() {
     lastCount = currentCount;
     lastTime  = currentTime;
   }
+  
 }
