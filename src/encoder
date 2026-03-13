@@ -1,4 +1,4 @@
-int8_t encoder_pin 9
+int8_t encoder_pin 9 //change as needed
 
 int16_t last_reading;
 int16_t current_reading;
