@@ -1,0 +1,29 @@
+/*
+  DHT sensor
+  Temp-range: 0-50 °C   accuracy: ±2
+  Humid_range: 0-80%    accuracy: 5%
+  Sampling rate: 1Hz (Data is output every second)
+*/
+
+#include <DHT11.h> // DHT11 Library
+#define sensor_pin 8 // macro - it is a preprocessor directive. It is handled before the code compile.
+
+DHT11 dht(sensor_pin);
+int16_t dt = 1000;
+
+void setup(){
+  Serial.begin(115200);
+}
+
+void loop(){
+  int16_t humidity = dht.readHumidity();
+
+  if(humidity != DHT11::ERROR_CHECKSUM && humidity != DHT11::ERROR_TIMEOUT){
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.println("%");
+  }
+  else{
+    Serial.println(DHT11::getErrorString(humidity));
+  }
+}
