@@ -1,0 +1,15 @@
+
+
+for(int8_t pwm = 0; pwm < 255; pwm++){
+     analogWrite(ENABLE_B, pwm);
+    //  analogWrite(ENABLE_A, pwm);
+     delay(100);
+  }
+  delay(200);
+
+  for(int8_t pwm = 255; pwm >= 0; pwm--){
+     analogWrite(ENABLE_B, pwm);
+    //  analogWrite(ENABLE_A, pwm);
+     delay(100);
+  }
+  delay(200);
