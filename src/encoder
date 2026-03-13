@@ -1,14 +1,14 @@
 int8_t encoder_pin 9 //change as needed
 
-int16_t last_reading;
-int16_t current_reading;
+int8_t last_reading;
+int8_t current_reading;
 
 int16_t count = 0;
 
 void setup() {
   // put your setup code here, to run once:
   
-int16_t last_reading = digitalRead(encoder_pin);
+int18_t last_reading = digitalRead(encoder_pin);
 }
 
 void loop() {
@@ -17,7 +17,7 @@ void loop() {
 }
 
 void encoder(){
-  int16_t current_reading = digitalRead(encoder_pin);
+  int8_t current_reading = digitalRead(encoder_pin);
   
   if(current_reading != last_reading){
     count++;
