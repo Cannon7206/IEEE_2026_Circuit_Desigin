@@ -1,52 +1,44 @@
-#define ENCODER_PIN 2
+#define ENCODER_PIN 9
+#define NORMAL_RPM 200
 #define ENCODER_PULSES_PER_ROTATION 20
 
-volatile long count = 0;     // updated inside interrupt
-bool last_reading = 0;
+bool last_reading;
+bool current_readin;
 
-unsigned long lastTime = 0;
-long lastCount = 0;
+
+volatile uint16_t count = 0;
+uint16_t total_rpm;
 
 void setup() {
-  Serial.begin(115200);
-
-  pinMode(ENCODER_PIN, INPUT_PULLUP);   // use INPUT if your encoder already has proper external pull-up/down
-
+  pinMode(ENCODER_PIN, INPUT_PULLUP);
+  
   last_reading = digitalRead(ENCODER_PIN);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN), updateMotorPosition, CHANGE);
 
-  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN), countEncoder, CHANGE);
-
-  lastTime = millis();
 }
 
 void loop() {
-  unsigned long currentTime = millis();
-
-  // calculate RPM every 1000 ms
-  if (currentTime - lastTime >= 1000) {
-    noInterrupts();
-    long currentCount = count;
-    interrupts();
-
-    long deltaCount = currentCount - lastCount;
-    float rpm = (deltaCount * 60.0) / ENCODER_PULSES_PER_ROTATION;
-
-    Serial.print("Encoder Count: ");
-    Serial.print(currentCount);
-    Serial.print(" , RPM: ");
-    Serial.println(rpm);
-
-    lastCount = currentCount;
-    lastTime = currentTime;
-  }
+  // put your main code here, to run repeatedly:
+  total_rpm = RPM_CAL(count);
+  Serial.print("Encoder: ");
+  Serial.print(count);
+  Serial.print(" , ");
+  Serial.print("TOTAL RPM: ");
+  Serial.print(total_rpm);
 }
 
-void countEncoder() {
+void updateMotorPosition(){
   bool current_reading = digitalRead(ENCODER_PIN);
 
-  if (current_reading != last_reading) {
+  if(current_reading != last_reading){
     count++;
-    last_reading = current_reading;
   }
+
+  last_reading = current_reading;
+
 }
 
+uint16_t RPM_CAL(uint16_t COUNT){
+  uint16_t RPM = ((COUNT/ENCODER_PULSES_PER_ROTATION) * 60) / 2;
+  return RPM;
+}
